@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<title>Okos receptkereső</title>
+
+<style>
+body { font-family: Arial; background:#f4f4f4; padding:20px; }
+input { padding:10px; width:320px; }
+button { padding:10px; cursor:pointer; }
+.recipe { background:white; padding:15px; margin-top:10px; border-radius:10px; }
+.badge { background:#222; color:white; padding:3px 8px; border-radius:5px; font-size:12px; }
+</style>
+</head>
+
+<body>
+
+<h1>🧠 Mit főzzek ebből?</h1>
+
+<p>Add meg ami otthon van (vesszővel):</p>
+
+<input id="ingredients" placeholder="pl. tojás, liszt, tej">
+<button onclick="search()">Mehet</button>
+
+<div id="results"></div>
+
+<script>
+
+const recipes = [
+  {
+    name: "Palacsinta",
+    ingredients: ["tojás", "liszt", "tej", "cukor"],
+    desc: "Klasszikus palacsinta."
+  },
+  {
+    name: "Rántotta",
+    ingredients: ["tojás", "só", "vaj"],
+    desc: "Gyors reggeli."
+  },
+  {
+    name: "Kakaós tej",
+    ingredients: ["tej", "kakaó", "cukor"],
+    desc: "Meleg, édes ital."
+  },
+  {
+    name: "Sajtos tojás",
+    ingredients: ["tojás", "sajt", "vaj"],
+    desc: "Krémes tojásos étel."
+  }
+];
+
+function search() {
+  const input = document.getElementById("ingredients").value;
+  const have = input.toLowerCase().split(",").map(x => x.trim());
+
+  let results = [];
+
+  recipes.forEach(r => {
+    let matchCount = 0;
+
+    r.ingredients.forEach(i => {
+      if (have.includes(i)) matchCount++;
+    });
+
+    const score = matchCount / r.ingredients.length;
+
+    if (score > 0) {
+      results.push({ ...r, score });
+    }
+  });
+
+  results.sort((a, b) => b.score - a.score);
+
+  const box = document.getElementById("results");
+  box.innerHTML = "";
+
+  if (results.length === 0) {
+    box.innerHTML = "<p>Nincs találat 😢</p>";
+    return;
+  }
+
+  results.forEach(r => {
+    box.innerHTML += `
+      <div class="recipe">
+        <h3>${r.name} <span class="badge">${Math.round(r.score * 100)}%</span></h3>
+        <p>${r.desc}</p>
+      </div>
+    `;
+  });
+}
+
+</script>
+
+</body>
+</html>
